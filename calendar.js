@@ -2,10 +2,12 @@
 /*
 * @params dom(日历放置位置的ＤＯＭ) fn(点击日期的回调方法) start(开始星期，默认星期天0)
 **/
-function Calendar ({dom, fn, start}) {
+function Calendar ({dom, fn, start, title, shield}) {
   this.dom = dom
-  this.clickLi = fn
-  this.start = start
+  this.clickLi = fn || function () {}
+  this.start = start || 0
+  this.title = title
+  this.shield = shield
   let nowDate = new Date()
   this.nowYear = nowDate.getFullYear() // 获取年份
   // var nowWeek = nowDate.getDay() // 获取星期，0-6代表星期天到星期一*
@@ -37,7 +39,11 @@ function Calendar ({dom, fn, start}) {
 // 设置头部（日期显示，星期行）
 Calendar.prototype.setHeaderTime = function () {
   // 头部显示时间
-  this.$time.innerText = this.nowYear + '年' + this.nowMonth + '月'
+  if (this.title) {
+    this.$time.innerText = this.nowYear + '年' + this.nowMonth + '月'
+  } else {
+    this.$time.innerText = ''
+  }
 }
 
 Calendar.prototype.setHeaderWeek = function () {
@@ -47,6 +53,10 @@ Calendar.prototype.setHeaderWeek = function () {
   }
 
   this.dom.appendChild(this.$week)
+}
+
+Calendar.prototype.getNowDate = function () {
+  return {year: this.nowYear, month: this.nowMonth, day: this.nowDay}
 }
 
 // 核心方法
@@ -113,7 +123,7 @@ Calendar.prototype.createCalendar = function (fn) {
     let _self = this
     html.onclick = function () {
       _self.setDate(item, index)
-      _self.clickLi(item, index)
+      _self.clickLi({year: _self.nowYear, month: _self.nowMonth, day: item.day})
     }
   })
   $uls.forEach(item => {
@@ -121,6 +131,7 @@ Calendar.prototype.createCalendar = function (fn) {
   })
 
   this.dom.appendChild(this.$date)
+  this.setHeaderTime()
 }
 
 // 获取当前月份多少天
@@ -151,11 +162,7 @@ Calendar.prototype.monthSize = function (year, month) {
 // 判断日期是否为本月最后一天
 Calendar.prototype.isLast = function () {
   let maxSize = this.monthSize()
-  if (this.nowDay === maxSize) {
-    return true
-  } else {
-    return false
-  }
+  return this.nowDay === maxSize
 }
 
 // 点击日期
@@ -165,11 +172,14 @@ Calendar.prototype.setDate = function (item, index) {
     this.$lis = this.$date.getElementsByTagName('li')
   }
   this.nowDay = item.day
-  if (item.mark === 0) {
-    let li = this.$date.getElementsByClassName('active')[0]
+  let li = this.$date.getElementsByClassName('active')[0]
+  if (li.className.indexOf('other') !== -1) {
+    li.className = 'other'
+  } else {
     li.className = ''
-    this.$lis[index].className = 'active'
-  } else if (item.mark === 1) {
+  }
+  this.$lis[index].className = this.$lis[index].className +' active'
+  if (item.mark === 1 && !this.shield) {
     if (this.nowMonth === 1) {
       this.nowYear--
       this.nowMonth = 12
@@ -177,7 +187,7 @@ Calendar.prototype.setDate = function (item, index) {
       this.nowMonth--
     }
     this.createCalendar()
-  } else if (item.mark === 2) {
+  } else if (item.mark === 2 && !this.shield) {
     if (this.nowMonth === 12) {
       this.nowYear++
       this.nowMonth = 1
@@ -209,8 +219,4 @@ Calendar.prototype.next = function () {
   }
   this.createCalendar()
   this.setHeaderTime()
-}
-
-export {
-  Calendar
 }

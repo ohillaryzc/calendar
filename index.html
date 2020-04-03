@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Calendar</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        li{
+            list-style: none;
+        }
+        .container{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .calendar-title{
+            text-align: center;
+            line-height: 40px;
+        }
+        .calendar-header{
+            border-bottom: 1px solid #eee;
+        }
+        .calendar ul, .calendar-header{
+            overflow: hidden;
+        }
+        .calendar-header li, .calendar li{
+            float: left;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+        }
+        .calendar .active span{
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid #409EFF;
+            color: #409EFF;
+            box-sizing: border-box;
+            line-height: 39px;
+        }
+        .calendar{
+            background-color: #EBEEF5;
+        }
+        .calendar .other{
+            background-color: #F2F6FC;
+        }
+        .container .nt{
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 36px;
+            font-size: 30px;
+            background-color: #F2F6FC;
+            color: #C0C4CC;
+            margin: 0 16px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .btns{
+            display: flex;
+            justify-content: center;
+        }
+        .btns .btn{
+            padding: 6px 12px;
+            background-color: #409EFF;
+            border-radius: 8px;
+            margin: 10px;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <span class="nt" id="pre"> < </span>
+    <div id="calendar-box"></div>
+    <span class="nt" id="next"> > </span>
+</div>
+<div style="text-align: center;" id="date"></div>
+<div class="btns">
+    <div class="btn" id="btn1">头部显示</div>
+    <div class="btn" id="btn2">头部隐藏</div>
+    <div class="btn" id="btn3">非本月切换屏蔽</div>
+    <div class="btn" id="btn4">非本月切换启用</div>
+    <div class="btn" id="btn5">获取当前时间</div>
+</div>
+<script src="./calendar.js"></script>
+<script>
+    let calender = new Calendar({dom: document.getElementById('calendar-box'), fn: function (date) {
+            document.getElementById('date').innerText = `${date.year}年${date.month}月${date.day}日`
+        }, title: true, shield: true})
+    calender.createCalendar()
+    document.getElementById('pre').onclick = function () {
+        calender.previous()
+    }
+    document.getElementById('next').onclick = function () {
+        calender.next()
+    }
+
+    document.getElementById('btn1').onclick = function () {
+        calender.title = true
+        calender.createCalendar()
+    }
+    document.getElementById('btn2').onclick = function () {
+        calender.title = false
+        calender.createCalendar()
+    }
+    document.getElementById('btn3').onclick = function () {
+        calender.shield = true
+        calender.createCalendar()
+    }
+    document.getElementById('btn4').onclick = function () {
+        calender.shield = false
+        calender.createCalendar()
+    }
+    document.getElementById('btn5').onclick = function () {
+        let date = calender.getNowDate()
+        alert(JSON.stringify(date))
+    }
+</script>
+</body>
+</html>
